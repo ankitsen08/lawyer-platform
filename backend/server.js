@@ -1226,8 +1226,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.BACKEND_PORT || 3001;
-server.listen(PORT, () => {
-  console.log(`[⚡] LawyerComparison API & Socket.IO server running on port ${PORT}`);
-});
+if (require.main === module) {
+  const PORT = process.env.BACKEND_PORT || 3001;
+  server.listen(PORT, () => {
+    console.log(`[⚡] LawyerComparison API & Socket.IO server running on port ${PORT}`);
+  });
+}
+
+module.exports = { app, server, io };
 
