@@ -31,7 +31,51 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-async function getLawyerData(id: string) {
+interface PeerEndorsement {
+  endorserName: string;
+  endorserFirm: string;
+  relationship: string;
+  text: string;
+}
+
+interface CaseResult {
+  amount: string;
+  type: string;
+  description: string;
+}
+
+interface ClientReview {
+  author: string;
+  date: string;
+  rating: number;
+  text: string;
+}
+
+interface LawyerProfile {
+  id: string;
+  name: string;
+  firm: string;
+  rating: number;
+  reviewCount: number;
+  location: string;
+  imageUrl: string;
+  badges: string[];
+  about: string;
+  practiceAreas: string[];
+  specialty: string;
+  hourlyRate: string;
+  freeConsultation: boolean;
+  contact: {
+    phone: string;
+    email: string;
+    address: string;
+  };
+  peerEndorsements: PeerEndorsement[];
+  caseResults: CaseResult[];
+  reviews: ClientReview[];
+}
+
+async function getLawyerData(id: string): Promise<LawyerProfile> {
   try {
     const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
     const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/lawyers/${id}`, {
@@ -44,13 +88,13 @@ async function getLawyerData(id: string) {
           id: data.id || id,
           name: data.name,
           firm: data.firm || "Independent Legal Practice",
-          rating: data.rating || 5.0,
-          reviewCount: data.reviewCount || 42,
+          rating: Number(data.rating) || 5.0,
+          reviewCount: Number(data.reviewCount) || 42,
           location: data.location || "United States",
           imageUrl: data.imageUrl || "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&auto=format&fit=crop&q=80",
-          badges: data.badges || ["Top Rated Attorney", "Verified State Bar Member", "Client Champion"],
+          badges: Array.isArray(data.badges) ? data.badges : ["Top Rated Attorney", "Verified State Bar Member", "Client Champion"],
           about: data.about || data.description || "A dedicated attorney focused on achieving superior outcomes.",
-          practiceAreas: data.practiceAreas || [data.specialty || "Corporate Litigation"],
+          practiceAreas: Array.isArray(data.practiceAreas) ? data.practiceAreas : [data.specialty || "Corporate Litigation"],
           specialty: data.specialty || "Corporate Litigation",
           hourlyRate: data.hourlyRate || "$350/hr",
           freeConsultation: data.freeConsultation ?? true,
@@ -226,7 +270,7 @@ export default async function LawyerProfilePage({ params }: { params: Promise<{ 
 
               {/* Badges */}
               <div className="flex flex-wrap gap-2 pt-2">
-                {lawyer.badges.map((badge, idx) => (
+                {lawyer.badges.map((badge: string, idx: number) => (
                   <span 
                     key={idx} 
                     className="inline-flex items-center gap-1.5 border border-color-border-light bg-white px-3 py-1 text-xs font-semibold text-color-foreground uppercase tracking-wide shadow-sm"
@@ -268,7 +312,7 @@ export default async function LawyerProfilePage({ params }: { params: Promise<{ 
                 Practice Areas
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {lawyer.practiceAreas.map((area, idx) => (
+                {lawyer.practiceAreas.map((area: string, idx: number) => (
                   <div key={idx} className="flex items-center gap-3 border border-color-border-light p-4 bg-white shadow-sm">
                     <CheckCircle2 className="h-5 w-5 text-color-foreground shrink-0" />
                     <span className="font-semibold text-sm">{area}</span>
@@ -283,7 +327,7 @@ export default async function LawyerProfilePage({ params }: { params: Promise<{ 
                 Notable Case Results
               </h2>
               <div className="space-y-4">
-                {lawyer.caseResults.map((result, idx) => (
+                {lawyer.caseResults.map((result: CaseResult, idx: number) => (
                   <div key={idx} className="border-l-4 border-color-foreground bg-white p-6 shadow-sm border border-color-border-light border-l-color-foreground">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-2xl font-black tracking-tight">{result.amount}</span>
@@ -307,7 +351,7 @@ export default async function LawyerProfilePage({ params }: { params: Promise<{ 
               </div>
               
               <div className="space-y-6">
-                {lawyer.reviews.map((review, idx) => (
+                {lawyer.reviews.map((review: ClientReview, idx: number) => (
                   <div key={idx} className="border border-color-border-light p-6 shadow-sm bg-white">
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -315,7 +359,7 @@ export default async function LawyerProfilePage({ params }: { params: Promise<{ 
                         <p className="text-xs text-color-text-muted mt-1">{review.date}</p>
                       </div>
                       <div className="flex gap-0.5">
-                        {[...Array(5)].map((_, i) => (
+                        {[...Array(5)].map((_: unknown, i: number) => (
                           <Star 
                             key={i} 
                             className={`h-4 w-4 ${i < review.rating ? 'fill-color-foreground text-color-foreground' : 'fill-gray-200 text-gray-200'}`} 
