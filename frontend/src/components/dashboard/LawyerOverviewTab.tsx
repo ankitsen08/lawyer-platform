@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Crown } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import Link from "next/link";
-
-const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+import { getServerUrl } from "@/utils/apiUrl";
 
 interface Stats {
   views: string;
@@ -23,6 +22,7 @@ export default function LawyerOverviewTab({ lawyerId, setActiveTab }: { lawyerId
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        const SERVER_URL = getServerUrl();
         const response = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/lawyers/${lawyerId}/stats`);
         if (!response.ok) throw new Error("Failed to fetch stats");
         const data = await response.json();

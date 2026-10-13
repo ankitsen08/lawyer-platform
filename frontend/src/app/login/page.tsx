@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ShieldCheck, Briefcase } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
+import { getServerUrl } from "@/utils/apiUrl";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -23,7 +24,7 @@ export default function LoginPage() {
     }
     
     try {
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}${endpoint}`, {
         method: 'POST',

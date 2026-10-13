@@ -5,8 +5,7 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Loader2 } from "lucide-react";
-
-const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+import { getServerUrl } from "@/utils/apiUrl";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -41,6 +40,7 @@ export default function LawyerEditProfileTab({ lawyerId }: { lawyerId: string })
   const onSubmit = async (data: ProfileFormValues) => {
     setIsSubmitting(true);
     try {
+      const SERVER_URL = getServerUrl();
       const response = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/lawyers/${lawyerId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

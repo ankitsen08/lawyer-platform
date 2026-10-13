@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 // @ts-ignore - Ignore module declaration warning
 import { io, Socket } from 'socket.io-client';
+import { getServerUrl } from '@/utils/apiUrl';
 
 export interface ChatMessage {
   id: string;
@@ -23,11 +24,10 @@ export const useChatSocket = (userId: string, activeChatId: string | null) => {
   }, []);
 
   useEffect(() => {
-    // Connect to the local Node server running on port 3001
-    const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+    const SERVER_URL = getServerUrl();
     
-    const socket = io(SERVER_URL, {
-      transports: ['websocket'],
+    const socket = io(SERVER_URL || undefined, {
+      transports: ['websocket', 'polling'],
       auth: { token: userId }
     });
     
@@ -124,7 +124,7 @@ export const useChatSocket = (userId: string, activeChatId: string | null) => {
   const fetchChatHistory = useCallback(async (receiverId: string) => {
     try {
       const roomId = getRoomId(userId, receiverId);
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const response = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/messages/${roomId}`);
       
       if (!response.ok) throw new Error('Failed to fetch messages');

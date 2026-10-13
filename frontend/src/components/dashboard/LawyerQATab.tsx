@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
 import { Loader2, MessageSquare, CheckCircle } from "lucide-react";
-
-const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+import { getServerUrl } from "@/utils/apiUrl";
 
 interface Question {
   _id: string;
@@ -28,6 +27,7 @@ export default function LawyerQATab() {
 
   const fetchQuestions = async () => {
     try {
+      const SERVER_URL = getServerUrl();
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/qa/questions/unanswered`);
       if (res.ok) {
         const data = await res.json();
@@ -48,6 +48,7 @@ export default function LawyerQATab() {
 
     setSubmitting(true);
     try {
+      const SERVER_URL = getServerUrl();
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/qa/answers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

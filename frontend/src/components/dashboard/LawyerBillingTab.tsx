@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { CreditCard, Crown, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getServerUrl } from "@/utils/apiUrl";
 
 export default function LawyerBillingTab() {
   const { lawyerSession, loginLawyer } = useAuthStore();
@@ -13,7 +14,7 @@ export default function LawyerBillingTab() {
   const handleUpgrade = async () => {
     setIsUpgrading(true);
     try {
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const lawyerId = user?._id || user?.email || 'lwy-001';
 
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/billing/create-checkout-session`, {

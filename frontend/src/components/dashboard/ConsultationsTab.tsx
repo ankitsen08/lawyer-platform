@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
 import { useChatStore } from "@/store/useChatStore";
 import { toast } from "sonner";
-
-const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+import { getServerUrl } from "@/utils/apiUrl";
 
 interface Consultation {
   id: string;
@@ -25,6 +24,7 @@ export default function ConsultationsTab({ userId, setActiveTab }: { userId: str
   useEffect(() => {
     const fetchConsultations = async () => {
       try {
+        const SERVER_URL = getServerUrl();
         const response = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/consultations/${userId}`);
         if (!response.ok) throw new Error("Failed to fetch");
         const data = await response.json();

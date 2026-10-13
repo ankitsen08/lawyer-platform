@@ -13,6 +13,9 @@
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
     "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "concurrently": "^10.0.5",
     "cors": "^2.8.6",
     "express": "^5.2.1",
@@ -27,15 +30,12 @@
     "socket.io-client": "^4.8.4",
     "sonner": "^2.0.8",
     "tailwindcss": "^4",
+    "typescript": "^5",
     "zod": "^3.25.76",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.3.6",
-    "typescript": "^5"
+    "eslint-config-next": "16.3.6"
   }
 }

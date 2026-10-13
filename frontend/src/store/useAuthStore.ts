@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getServerUrl } from '@/utils/apiUrl';
 
 export type User = {
   _id?: string;
@@ -59,7 +60,7 @@ export const useAuthStore = create<AuthState>()(
       
       hydrate: async () => {
         try {
-          const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+          const SERVER_URL = getServerUrl();
           const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/auth/me`, {
             credentials: 'include' // Cross-origin cookies required for local dev on different ports
           });

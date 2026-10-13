@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Star, MapPin, Award, Phone, Mail, Clock, CheckCircle2, ShieldCheck, Quote, TrendingUp, ArrowLeft } from "lucide-react";
 import ContactAttorneyClient from "@/components/lawyer/ContactAttorneyClient";
 import ConsultationBooking from "@/components/lawyer/ConsultationBooking";
+import { getServerUrl } from "@/utils/apiUrl";
 
 export const dynamicParams = true;
 
@@ -77,7 +78,7 @@ interface LawyerProfile {
 
 async function getLawyerData(id: string): Promise<LawyerProfile> {
   try {
-    const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+    const SERVER_URL = getServerUrl();
     const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/lawyers/${id}`, {
       next: { revalidate: 60 }
     });

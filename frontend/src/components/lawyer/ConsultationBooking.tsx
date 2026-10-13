@@ -5,6 +5,7 @@ import { Calendar, Clock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
+import { getServerUrl } from "@/utils/apiUrl";
 
 interface ConsultationBookingProps {
   lawyerId?: string;
@@ -53,7 +54,7 @@ export default function ConsultationBooking({ lawyerId, lawyerName, consultation
     setIsBooking(true);
     
     try {
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const user = clientSession.user;
 
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/consultations`, {

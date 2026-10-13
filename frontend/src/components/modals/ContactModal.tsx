@@ -7,6 +7,7 @@ import * as z from "zod";
 import { X, Loader2, CheckCircle2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useContactStore } from "@/store/useContactStore";
+import { getServerUrl } from "@/utils/apiUrl";
 
 const contactSchema = z.object({
   fullName: z.string().min(2, "Full name is required"),
@@ -58,7 +59,7 @@ export default function ContactModal() {
     setFormState("submitting");
     
     try {
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/inquiries`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

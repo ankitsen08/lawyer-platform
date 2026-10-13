@@ -7,6 +7,7 @@ import LawyerCardSkeleton from "@/components/lawyer/LawyerCardSkeleton";
 import { Lawyer } from "@/store/useCompareStore";
 import { AdvancedFilterSidebar } from "@/components/lawyers/AdvancedFilterSidebar";
 import { X, Search, SlidersHorizontal } from "lucide-react";
+import { getServerUrl } from "@/utils/apiUrl";
 
 const MOCK_LAWYERS: Lawyer[] = [
   {
@@ -125,7 +126,7 @@ function LawyersDirectoryContent() {
     const fetchLawyers = async () => {
       setIsLoading(true);
       try {
-        const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+        const SERVER_URL = getServerUrl();
         const params = new URLSearchParams();
 
         if (urlCategory) params.append("category", urlCategory);

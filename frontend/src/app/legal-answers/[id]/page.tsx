@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ArrowLeft, ShieldCheck, MessageSquare, ThumbsUp } from "lucide-react";
 import { MOCK_QUESTIONS } from "@/data/mockQuestions";
 import QuestionActions from "@/components/legal-answers/QuestionActions";
+import { getServerUrl } from "@/utils/apiUrl";
 
 export const dynamicParams = true;
 
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 async function getQuestion(id: string) {
   try {
-    const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+    const SERVER_URL = getServerUrl();
     const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/qa/questions/${id}`, {
       next: { revalidate: 30 }
     });

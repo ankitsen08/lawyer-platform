@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Search, MessageSquare, ChevronRight, ShieldCheck, ThumbsUp, ArrowRight, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import AskQuestionModal from "@/components/modals/AskQuestionModal";
+import { getServerUrl } from "@/utils/apiUrl";
 
 interface Answer {
   _id: string;
@@ -46,7 +47,7 @@ function LegalAnswersContent() {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       let url = `${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/qa/questions`;
       if (categoryFilter) {
         url += `?category=${encodeURIComponent(categoryFilter)}`;

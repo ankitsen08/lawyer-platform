@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuthStore } from "@/store/useAuthStore";
+import { getServerUrl } from "@/utils/apiUrl";
 
 interface AskQuestionModalProps {
   isOpen: boolean;
@@ -42,7 +43,7 @@ export default function AskQuestionModal({ isOpen, onClose, onSuccess }: AskQues
   const onSubmit = async (data: QuestionFormValues) => {
     setIsSubmitting(true);
     try {
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const user = clientSession.user;
 
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/qa/questions`, {

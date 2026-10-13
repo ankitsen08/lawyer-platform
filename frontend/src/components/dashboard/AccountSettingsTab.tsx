@@ -5,8 +5,7 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Loader2 } from "lucide-react";
-
-const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+import { getServerUrl } from "@/utils/apiUrl";
 
 const accountSchema = z.object({
   firstName: z.string().min(2, "First name is too short"),
@@ -34,6 +33,7 @@ export default function AccountSettingsTab() {
     if (!user) return;
     setIsSubmitting(true);
     try {
+      const SERVER_URL = getServerUrl();
       const response = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/users/${user.email}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

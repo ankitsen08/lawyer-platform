@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getServerUrl } from "@/utils/apiUrl";
 
 export default function ContactPage() {
   const [fullName, setFullName] = useState("");
@@ -18,7 +19,7 @@ export default function ContactPage() {
     setIsSubmitting(true);
     
     try {
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/inquiries`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
