@@ -20,11 +20,19 @@ async function bootstrap() {
         next = require(path.resolve(__dirname, 'node_modules/next'));
       }
     }
+    const fs = require('fs');
     const dev = process.env.NODE_ENV !== 'production';
-    const nextApp = next({ dev, dir: path.resolve(__dirname, 'frontend') });
+    
+    // Check whether .next is in frontend or root
+    let nextDir = path.resolve(__dirname, 'frontend');
+    if (!fs.existsSync(path.join(nextDir, '.next')) && fs.existsSync(path.resolve(__dirname, '.next'))) {
+      nextDir = path.resolve(__dirname);
+    }
+
+    const nextApp = next({ dev, dir: nextDir });
     const handle = nextApp.getRequestHandler();
 
-    console.log('[*] Preparing Next.js frontend engine...');
+    console.log('[*] Preparing Next.js frontend engine at:', nextDir);
     await nextApp.prepare();
     console.log('[+] Next.js engine ready');
 
@@ -33,9 +41,9 @@ async function bootstrap() {
       return handle(req, res);
     });
   } catch (err) {
-    console.error('[-] Next.js initialization warning:', err.message);
-    app.get('/', (req, res) => {
-      res.status(200).send('<!DOCTYPE html><html><head><title>LawyerComparison Platform</title></head><body style="font-family:sans-serif;text-align:center;padding:50px;"><h2>LawyerComparison Server Running</h2><p>Initializing frontend application...</p></body></html>');
+    console.error('[-] Next.js initialization error:', err.stack || err.message);
+    app.all('*', (req, res) => {
+      res.status(500).send(`<!DOCTYPE html><html><head><title>LawyerComparison Platform</title></head><body style="font-family:sans-serif;text-align:center;padding:50px;"><h2>LawyerComparison Server Running</h2><p>Frontend Initialization Issue:</p><pre style="background:#f4f4f4;padding:15px;display:inline-block;text-align:left;max-width:800px;overflow:auto;">${err.stack || err.message}</pre></body></html>`);
     });
   }
 
