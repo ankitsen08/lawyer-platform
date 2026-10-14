@@ -8,9 +8,9 @@
   ],
   "scripts": {
     "postinstall": "npm install --prefix frontend && npm install --prefix backend",
-    "build:frontend": "npm install --prefix frontend && npm run build --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
     "build:backend": "npm install --prefix backend",
-    "build": "npm install --prefix frontend && npm install --prefix backend && npm run build --prefix frontend && node scripts/copy-build.js",
+    "build": "node -e \"if(!require('fs').existsSync('frontend/node_modules')) require('child_process').execSync('npm install --prefix frontend && npm install --prefix backend', {stdio:'inherit'});\" && npm run build --prefix frontend && node scripts/copy-build.js",
     "start": "node server.js",
     "start:concurrent": "concurrently \"npm run start --prefix frontend\" \"node backend/server.js\"",
     "start:frontend": "npm run start --prefix frontend",
