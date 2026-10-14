@@ -4,9 +4,22 @@ const http = require('http');
 async function bootstrap() {
   const { app, server } = require('./backend/server');
 
+  // Health check endpoint to immediately verify Node server is active
+  app.get('/health', (req, res) => {
+    res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+  });
+
   try {
-    const nextPath = path.resolve(__dirname, 'frontend/node_modules/next');
-    const next = require(nextPath);
+    let next;
+    try {
+      next = require('next');
+    } catch (e1) {
+      try {
+        next = require(path.resolve(__dirname, 'frontend/node_modules/next'));
+      } catch (e2) {
+        next = require(path.resolve(__dirname, 'node_modules/next'));
+      }
+    }
     const dev = process.env.NODE_ENV !== 'production';
     const nextApp = next({ dev, dir: path.resolve(__dirname, 'frontend') });
     const handle = nextApp.getRequestHandler();
