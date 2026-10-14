@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  turbopack: {},
+  experimental: {
+    turbopackFileSystemCacheForBuild: false,
+  },
   async redirects() {
     return [
       {
