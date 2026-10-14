@@ -67,8 +67,9 @@ const fallbackMessages = [];
 const fallbackSavedAttorneys = {}; // map of clientId -> Set of lawyerIds
 
 // Database Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/lawyer_directory';
-const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-lawyer-key';
+const ATLAS_URI = 'mongodb://adityavishwa02_db_user:qO6CycHj3Dp3kzxR@ac-dp9nud3-shard-00-00.efy92ow.mongodb.net:27017,ac-dp9nud3-shard-00-01.efy92ow.mongodb.net:27017,ac-dp9nud3-shard-00-02.efy92ow.mongodb.net:27017/lawyer_directory?ssl=true&replicaSet=atlas-srphut-shard-0&authSource=admin&appName=Cluster0';
+const MONGODB_URI = process.env.MONGODB_URI || (process.env.NODE_ENV === 'production' ? ATLAS_URI : (process.env.MONGODB_LOCAL_URI || 'mongodb://127.0.0.1:27017/lawyer_directory'));
+const JWT_SECRET = process.env.JWT_SECRET || 'production_secure_lawyer_comparison_secret_jwt_key_2026';
 
 mongoose.connect(MONGODB_URI)
   .then(async () => {
