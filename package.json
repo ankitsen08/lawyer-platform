@@ -1,16 +1,25 @@
 {
   "name": "lawyer-directory-monorepo",
   "version": "1.0.0",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && node server.js",
+    "postinstall": "npm install --prefix frontend && npm install --prefix backend",
+    "build:frontend": "npm install --prefix frontend && npm run build --prefix frontend",
+    "build:backend": "npm install --prefix backend",
+    "build": "npm install --prefix frontend && npm install --prefix backend && npm run build --prefix frontend",
+    "start": "concurrently \"npm run start --prefix frontend\" \"node backend/server.js\"",
+    "start:frontend": "npm run start --prefix frontend",
+    "start:backend": "node backend/server.js",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "node backend/server.js",
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
-    "build:frontend": "npm run build --prefix frontend",
-    "build": "npm run build --prefix frontend",
-    "start": "node backend/server.js",
     "seed": "node backend/seed.js"
   },
-  "devDependencies": {
+  "dependencies": {
     "concurrently": "^10.0.5"
   }
 }
+
