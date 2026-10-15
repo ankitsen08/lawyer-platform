@@ -87,11 +87,64 @@ async function initNext() {
 // Start Next.js initialization in background
 initNext();
 
+// 5.5 Direct Static Asset Handling (Ultra-fast bypass, correct MIME types, no SSR overhead)
+const candidateStaticDirs = [
+  path.resolve(__dirname, '.next', 'static'),
+  path.resolve(__dirname, 'frontend', '.next', 'static'),
+];
+
+for (const staticDir of candidateStaticDirs) {
+  if (fs.existsSync(staticDir)) {
+    console.log(`[+] Direct static mapping: /_next/static -> ${staticDir}`);
+    app.use('/_next/static', express.static(staticDir, {
+      maxAge: '365d',
+      immutable: true,
+      fallthrough: true,
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.css')) {
+          res.setHeader('Content-Type', 'text/css; charset=UTF-8');
+        } else if (filePath.endsWith('.js')) {
+          res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+        }
+      }
+    }));
+    break;
+  }
+}
+
+// Direct Public Assets Mapping (/logo.jpg, /icon.jpg, etc.)
+const candidatePublicDirs = [
+  path.resolve(__dirname, 'public'),
+  path.resolve(__dirname, 'frontend', 'public'),
+];
+
+for (const pubDir of candidatePublicDirs) {
+  if (fs.existsSync(pubDir)) {
+    console.log(`[+] Direct public mapping: / -> ${pubDir}`);
+    app.use(express.static(pubDir, { maxAge: '7d', fallthrough: true }));
+    break;
+  }
+}
+
 // 6. Handle all frontend web traffic (Express 5 compatible fallback)
 app.use((req, res) => {
   // If Next.js is ready, pass through directly
   if (nextReady && nextHandle) {
     return nextHandle(req, res);
+  }
+
+  // CRITICAL: Never return HTML fallback for static asset requests!
+  // If browser receives HTML for a CSS or JS request, it refuses to apply it and poisons cache.
+  if (req.path.startsWith('/_next/') || /\.(css|js|map|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i.test(req.path)) {
+    if (req.path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css; charset=UTF-8');
+      return res.status(503).send('/* Stylesheet initializing */');
+    }
+    if (req.path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=UTF-8');
+      return res.status(503).send('/* Script initializing */');
+    }
+    return res.status(404).end();
   }
 
   // If Next.js encountered an initialization error, show readable diagnostic with auto-retry

@@ -48,14 +48,21 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-color-border-light bg-white/85 backdrop-blur-md transition-colors">
+    <nav className="sticky top-0 z-50 w-full border-b border-neutral-200 border-color-border-light bg-white/95 backdrop-blur-md transition-colors">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
         
         {/* Logo Section */}
         <div className="flex-shrink-0 font-bold text-xl tracking-tight">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.jpg" alt="LawyerComparison Logo" className="h-8 w-8 object-contain rounded-full border border-color-border-light" />
-            <span>LawyerComparison</span>
+            <img 
+              src="/logo.jpg" 
+              alt="LawyerComparison Logo" 
+              width={32}
+              height={32}
+              style={{ width: "32px", height: "32px", minWidth: "32px", minHeight: "32px", maxWidth: "32px", maxHeight: "32px" }}
+              className="h-8 w-8 object-contain rounded-full border border-neutral-200 border-color-border-light" 
+            />
+            <span className="text-neutral-900 text-color-foreground font-bold">LawyerComparison</span>
           </Link>
         </div>
 
@@ -63,25 +70,25 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-8 text-sm font-medium">
           <Link 
             href="/find" 
-            className="text-color-foreground hover:opacity-60 transition-minimal"
+            className="text-neutral-900 text-color-foreground hover:opacity-60 transition-minimal"
           >
             Find a Lawyer
           </Link>
           <Link 
             href="/categories" 
-            className="text-color-foreground hover:opacity-60 transition-minimal"
+            className="text-neutral-900 text-color-foreground hover:opacity-60 transition-minimal"
           >
             Categories
           </Link>
           <Link 
             href="/legal-answers" 
-            className="text-color-foreground hover:opacity-60 transition-minimal"
+            className="text-neutral-900 text-color-foreground hover:opacity-60 transition-minimal"
           >
             Free Q&A
           </Link>
           <Link 
             href="/compare" 
-            className="text-color-foreground hover:opacity-60 transition-minimal"
+            className="text-neutral-900 text-color-foreground hover:opacity-60 transition-minimal"
           >
             Compare
           </Link>
@@ -98,13 +105,13 @@ export default function Navbar() {
             <>
               <Link 
                 href="/client-login" 
-                className="text-sm font-bold text-color-foreground hover:opacity-60 transition-minimal"
+                className="text-sm font-bold text-neutral-900 text-color-foreground hover:opacity-60 transition-minimal"
               >
                 Client Login
               </Link>
               <Link 
                 href="/login" 
-                className="border border-color-foreground bg-color-foreground text-color-background px-4 py-2 text-sm font-medium hover:bg-transparent hover:text-color-foreground transition-minimal"
+                className="border border-black border-color-foreground bg-black bg-color-foreground text-white text-color-background px-4 py-2 text-sm font-medium hover:bg-neutral-800 transition-minimal rounded-sm"
               >
                 Lawyer Login
               </Link>
@@ -147,7 +154,7 @@ export default function Navbar() {
         <div className="flex items-center md:hidden">
           <button
             onClick={toggleMenu}
-            className="text-color-foreground p-2 focus:outline-none"
+            className="text-neutral-900 text-color-foreground p-2 focus:outline-none cursor-pointer"
             aria-label="Toggle menu"
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -157,50 +164,50 @@ export default function Navbar() {
 
       {/* Mobile Navigation */}
       {isOpen && (
-        <div className="md:hidden border-b border-color-border-light bg-color-background px-6 py-4 space-y-4">
+        <div className="md:hidden border-b border-neutral-200 border-color-border-light bg-white bg-color-background px-6 py-4 space-y-4">
           <Link 
             href="/find" 
-            className="block text-base font-medium text-color-foreground"
+            className="block text-base font-medium text-neutral-900 text-color-foreground hover:text-neutral-600"
             onClick={() => setIsOpen(false)}
           >
             Find a Lawyer
           </Link>
           <Link 
             href="/categories" 
-            className="block text-base font-medium text-color-foreground"
+            className="block text-base font-medium text-neutral-900 text-color-foreground hover:text-neutral-600"
             onClick={() => setIsOpen(false)}
           >
             Categories
           </Link>
           <Link 
             href="/legal-answers" 
-            className="block text-base font-medium text-color-foreground"
+            className="block text-base font-medium text-neutral-900 text-color-foreground hover:text-neutral-600"
             onClick={() => setIsOpen(false)}
           >
             Free Q&A
           </Link>
           <Link 
             href="/compare" 
-            className="block text-base font-medium text-color-foreground"
+            className="block text-base font-medium text-neutral-900 text-color-foreground hover:text-neutral-600"
             onClick={() => setIsOpen(false)}
           >
             Compare
           </Link>
-          <div className="pt-4 border-t border-color-border-light flex flex-col gap-3">
+          <div className="pt-4 border-t border-neutral-200 border-color-border-light flex flex-col gap-3">
             {!isMounted ? (
               <div className="h-10 bg-neutral-200 animate-pulse rounded w-full"></div>
             ) : !isAuthenticated ? (
               <>
                 <Link 
                   href="/client-login" 
-                  className="inline-block text-base font-bold text-color-foreground"
+                  className="inline-block text-base font-bold text-neutral-900 text-color-foreground"
                   onClick={() => setIsOpen(false)}
                 >
                   Client Login
                 </Link>
                 <Link 
                   href="/login" 
-                  className="inline-block border border-color-foreground bg-color-foreground text-color-background px-4 py-2 text-sm font-medium text-center"
+                  className="inline-block border border-black border-color-foreground bg-black bg-color-foreground text-white text-color-background px-4 py-2 text-sm font-medium text-center rounded-sm"
                   onClick={() => setIsOpen(false)}
                 >
                   Lawyer Login
@@ -210,14 +217,14 @@ export default function Navbar() {
               <>
                 <Link 
                   href={activeRole === 'lawyer' ? "/attorney-dashboard" : "/client-dashboard"}
-                  className="flex items-center gap-2 text-base font-bold text-color-foreground"
+                  className="flex items-center gap-2 text-base font-bold text-neutral-900 text-color-foreground"
                   onClick={() => setIsOpen(false)}
                 >
                   <LayoutDashboard className="w-5 h-5" /> Dashboard
                 </Link>
                 <button 
                   onClick={handleLogout}
-                  className="flex items-center gap-2 text-base font-bold text-red-600"
+                  className="flex items-center gap-2 text-base font-bold text-red-600 cursor-pointer text-left"
                 >
                   <LogOut className="w-5 h-5" /> Sign Out
                 </button>
