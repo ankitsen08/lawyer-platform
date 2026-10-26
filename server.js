@@ -1,6 +1,7 @@
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
+const express = require('express');
 
 // 1. Immediately normalize HOST and PORT for Hostinger / cloud containers
 const SYSTEM_PORT = process.env.PORT;
