@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 // @ts-ignore - Ignore module declaration warning
 import { io, Socket } from 'socket.io-client';
+import { getServerUrl } from '@/utils/apiUrl';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export interface ChatMessage {
   id: string;
@@ -23,12 +25,14 @@ export const useChatSocket = (userId: string, activeChatId: string | null) => {
   }, []);
 
   useEffect(() => {
-    // Connect to the local Node server running on port 3001
-    const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+    const SERVER_URL = getServerUrl();
+    const { clientSession, lawyerSession } = useAuthStore.getState();
+    const authToken = clientSession.token || lawyerSession.token || undefined;
     
-    const socket = io(SERVER_URL, {
-      transports: ['websocket'],
-      auth: { token: userId }
+    const socket = io(SERVER_URL || undefined, {
+      transports: ['websocket', 'polling'],
+      withCredentials: true,
+      auth: { token: authToken }
     });
     
     socketRef.current = socket;
@@ -124,7 +128,7 @@ export const useChatSocket = (userId: string, activeChatId: string | null) => {
   const fetchChatHistory = useCallback(async (receiverId: string) => {
     try {
       const roomId = getRoomId(userId, receiverId);
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const response = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/messages/${roomId}`);
       
       if (!response.ok) throw new Error('Failed to fetch messages');

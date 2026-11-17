@@ -23,15 +23,15 @@ const categories = [
 
 export default function CategoryGrid() {
   return (
-    <section className="w-full bg-color-background px-6 py-20 lg:px-8">
+    <section className="w-full bg-white bg-color-background px-6 py-20 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-12 md:flex md:items-center md:justify-between">
-          <h2 className="text-3xl font-bold tracking-tight text-color-foreground">
+          <h2 className="text-3xl font-bold tracking-tight text-neutral-900 text-color-foreground">
             Top Legal Categories
           </h2>
           <Link 
             href="/categories" 
-            className="hidden md:block text-sm font-semibold text-color-text-muted hover:text-color-foreground transition-minimal"
+            className="hidden md:block text-sm font-semibold text-neutral-500 text-color-text-muted hover:text-neutral-900 hover:text-color-foreground transition-minimal"
           >
             View all categories &rarr;
           </Link>
@@ -44,16 +44,16 @@ export default function CategoryGrid() {
               <Link
                 key={category.name}
                 href={category.href}
-                className="group relative flex flex-col items-start justify-between border border-color-border-light bg-color-background p-6 transition-minimal hover:border-color-foreground hover:shadow-sm"
+                className="group relative flex flex-col items-start justify-between border border-neutral-200 border-color-border-light bg-white bg-color-background p-6 transition-minimal hover:border-black hover:border-color-foreground hover:shadow-sm rounded-sm"
               >
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center bg-color-foreground text-color-background transition-minimal group-hover:scale-105">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center bg-black bg-color-foreground text-white text-color-background transition-minimal group-hover:scale-105 rounded-sm">
                   <Icon className="h-6 w-6" aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-color-foreground">
+                  <h3 className="text-lg font-semibold text-neutral-900 text-color-foreground">
                     {category.name}
                   </h3>
-                  <p className="mt-2 text-sm text-color-text-muted transition-minimal group-hover:text-color-foreground">
+                  <p className="mt-2 text-sm text-neutral-500 text-color-text-muted transition-minimal group-hover:text-black group-hover:text-color-foreground">
                     Find lawyers &rarr;
                   </p>
                 </div>
@@ -65,7 +65,7 @@ export default function CategoryGrid() {
         <div className="mt-8 md:hidden">
           <Link 
             href="/categories" 
-            className="block w-full border border-color-foreground bg-transparent py-3 text-center text-sm font-semibold text-color-foreground hover:bg-color-foreground hover:text-color-background transition-minimal"
+            className="block w-full border border-black border-color-foreground bg-transparent py-3 text-center text-sm font-semibold text-neutral-900 text-color-foreground hover:bg-black hover:text-white transition-minimal rounded-sm"
           >
             View all categories
           </Link>

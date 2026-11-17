@@ -9,6 +9,7 @@ let nextHandle = null;
 let nextReady = false;
 let nextError = null;
 
+
 // 1. Immediately normalize HOST and PORT for Hostinger / cloud containers
 const SYSTEM_PORT = process.env.PORT;
 const PORT = parseInt(SYSTEM_PORT || process.env.APP_PORT || '3000', 10);

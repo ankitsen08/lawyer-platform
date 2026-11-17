@@ -5,8 +5,7 @@ import Image from "next/image";
 import { Search, ArrowLeft, Send } from "lucide-react";
 import { useChatSocket } from "@/hooks/useChatSocket";
 import TypingIndicator from "./TypingIndicator";
-
-const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+import { getServerUrl } from "@/utils/apiUrl";
 
 interface ClientConversation {
   id: string;
@@ -42,7 +41,10 @@ export default function LawyerMessagesTab({ lawyerId }: { lawyerId: string }) {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/lawyer/${lawyerId}/conversations`);
+        const SERVER_URL = getServerUrl();
+        const response = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/lawyer/${lawyerId}/conversations`, {
+          credentials: 'include'
+        });
         if (!response.ok) throw new Error("Failed to fetch conversations");
         const data = await response.json();
         setClients(data);

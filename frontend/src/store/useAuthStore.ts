@@ -1,8 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getServerUrl } from '@/utils/apiUrl';
 
 export type User = {
   _id?: string;
+  id?: string;
   name?: string;
   firstName?: string;
   lastName?: string;
@@ -11,6 +13,34 @@ export type User = {
   email: string;
   avatar?: string;
   phone?: string;
+  smsConsent?: boolean;
+  isVerified?: boolean;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  preferredContactMethod?: 'email' | 'phone' | 'sms' | 'whatsapp';
+  caseProfile?: {
+    legalCategory?: string;
+    legalSubCategory?: string;
+    urgency?: string;
+    incidentDate?: string;
+    opposingParty?: string;
+    budgetRange?: string;
+    preferredFormat?: string;
+    preferredContactMethod?: string;
+    smsNotifications?: boolean;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    notes?: string;
+    attachments?: Array<{
+      name: string;
+      size: number;
+      mimeType: string;
+      dataUrl: string;
+      uploadedAt?: string;
+    }>;
+  };
   plan?: string;
   specialty?: string;
   bio?: string;
@@ -23,43 +53,119 @@ export type User = {
 interface Session {
   isAuthenticated: boolean;
   user: User | null;
+  token?: string | null;
 }
 
 interface AuthState {
   clientSession: Session;
   lawyerSession: Session;
-  loginClient: (user: User) => void;
-  logoutClient: () => void;
-  loginLawyer: (user: User) => void;
-  logoutLawyer: () => void;
+  loginClient: (user: User, token?: string) => void;
+  logoutClient: () => Promise<void>;
+  loginLawyer: (user: User, token?: string) => void;
+  logoutLawyer: () => Promise<void>;
+  clearClientSession: () => void;
   hydrate: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
-      clientSession: { isAuthenticated: false, user: null },
-      lawyerSession: { isAuthenticated: false, user: null },
+    (set, get) => ({
+      clientSession: { isAuthenticated: false, user: null, token: null },
+      lawyerSession: { isAuthenticated: false, user: null, token: null },
       
-      loginClient: (user) => {
-        set({ clientSession: { isAuthenticated: true, user } });
+      clearClientSession: () => {
+        set({ clientSession: { isAuthenticated: false, user: null, token: null } });
+        if (typeof window !== 'undefined') {
+          try {
+            const raw = localStorage.getItem('auth-storage');
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed?.state) {
+                parsed.state.clientSession = { isAuthenticated: false, user: null, token: null };
+                localStorage.setItem('auth-storage', JSON.stringify(parsed));
+              }
+            }
+          } catch (_) {}
+        }
       },
-      logoutClient: () => {
-        if (typeof window !== "undefined") document.cookie = "client_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        set({ clientSession: { isAuthenticated: false, user: null } });
+
+      loginClient: (user, token) => {
+        set({ clientSession: { isAuthenticated: true, user, token: token || null } });
+        if (typeof window !== 'undefined') {
+          try {
+            const raw = localStorage.getItem('auth-storage');
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed?.state) {
+                parsed.state.clientSession = { isAuthenticated: true, user, token: token || null };
+                localStorage.setItem('auth-storage', JSON.stringify(parsed));
+              }
+            }
+          } catch (_) {}
+        }
+      },
+
+      logoutClient: async () => {
+        try {
+          const SERVER_URL = getServerUrl();
+          await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/auth/logout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role: 'client' }),
+            credentials: 'include'
+          });
+        } catch (e) {
+          console.error("Logout request failed", e);
+        }
+        set({ clientSession: { isAuthenticated: false, user: null, token: null } });
+        if (typeof window !== 'undefined') {
+          try {
+            const raw = localStorage.getItem('auth-storage');
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed?.state) {
+                parsed.state.clientSession = { isAuthenticated: false, user: null, token: null };
+                localStorage.setItem('auth-storage', JSON.stringify(parsed));
+              }
+            }
+          } catch (_) {}
+        }
       },
       
-      loginLawyer: (user) => {
-        set({ lawyerSession: { isAuthenticated: true, user } });
+      loginLawyer: (user, token) => {
+        set({ lawyerSession: { isAuthenticated: true, user, token: token || null } });
       },
-      logoutLawyer: () => {
-        if (typeof window !== "undefined") document.cookie = "lawyer_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        set({ lawyerSession: { isAuthenticated: false, user: null } });
+
+      logoutLawyer: async () => {
+        try {
+          const SERVER_URL = getServerUrl();
+          await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/auth/logout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role: 'lawyer' }),
+            credentials: 'include'
+          });
+        } catch (e) {
+          console.error("Logout request failed", e);
+        }
+        set({ lawyerSession: { isAuthenticated: false, user: null, token: null } });
+        if (typeof window !== 'undefined') {
+          try {
+            const raw = localStorage.getItem('auth-storage');
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed?.state) {
+                parsed.state.lawyerSession = { isAuthenticated: false, user: null, token: null };
+                localStorage.setItem('auth-storage', JSON.stringify(parsed));
+              }
+            }
+          } catch (_) {}
+        }
       },
       
       hydrate: async () => {
         try {
-          const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+          const SERVER_URL = getServerUrl();
           const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/auth/me`, {
             credentials: 'include' // Cross-origin cookies required for local dev on different ports
           });
@@ -67,22 +173,35 @@ export const useAuthStore = create<AuthState>()(
           if (res.ok) {
             const data = await res.json();
             
-            // If the backend decoded a valid JWT, set the session
+            // If the backend decoded a valid JWT, sync session state
             if (data.clientUser) {
-              set({ clientSession: { isAuthenticated: true, user: data.clientUser } });
-            } else if (data.lawyerUser) {
-              set({ lawyerSession: { isAuthenticated: true, user: data.lawyerUser } });
+              set((state) => ({ clientSession: { isAuthenticated: true, user: data.clientUser, token: state.clientSession.token } }));
             } else {
-              // If backend returned nulls (due to a missing or invalid legacy dummy cookie), clear the state
-              if (typeof window !== "undefined") {
-                document.cookie = "client_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                document.cookie = "lawyer_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+              set({ clientSession: { isAuthenticated: false, user: null, token: null } });
+              if (typeof window !== 'undefined') {
+                try {
+                  const raw = localStorage.getItem('auth-storage');
+                  if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed?.state?.clientSession?.isAuthenticated) {
+                      parsed.state.clientSession = { isAuthenticated: false, user: null, token: null };
+                      localStorage.setItem('auth-storage', JSON.stringify(parsed));
+                    }
+                  }
+                } catch (_) {}
               }
-              set({ 
-                clientSession: { isAuthenticated: false, user: null },
-                lawyerSession: { isAuthenticated: false, user: null } 
-              });
             }
+
+            if (data.lawyerUser) {
+              set((state) => ({ lawyerSession: { isAuthenticated: true, user: data.lawyerUser, token: state.lawyerSession.token } }));
+            } else {
+              set({ lawyerSession: { isAuthenticated: false, user: null, token: null } });
+            }
+          } else {
+            set({
+              clientSession: { isAuthenticated: false, user: null, token: null },
+              lawyerSession: { isAuthenticated: false, user: null, token: null }
+            });
           }
         } catch (error) {
           console.error("Hydration failed", error);

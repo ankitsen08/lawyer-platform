@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Crown } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import Link from "next/link";
-
-const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+import { getServerUrl } from "@/utils/apiUrl";
 
 interface Stats {
   views: string;
@@ -23,6 +22,7 @@ export default function LawyerOverviewTab({ lawyerId, setActiveTab }: { lawyerId
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        const SERVER_URL = getServerUrl();
         const response = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/lawyers/${lawyerId}/stats`);
         if (!response.ok) throw new Error("Failed to fetch stats");
         const data = await response.json();
@@ -92,9 +92,24 @@ export default function LawyerOverviewTab({ lawyerId, setActiveTab }: { lawyerId
 
       {/* Action Required / Next Steps */}
       <div className="bg-white border border-neutral-200 p-8 shadow-sm">
-        <h2 className="text-xl font-bold tracking-tight text-black mb-6">Optimize Your Profile</h2>
+        <h2 className="text-xl font-bold tracking-tight text-black mb-6">Optimize Your Profile &amp; Intake Queue</h2>
         <div className="space-y-4">
           
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-black gap-4 bg-neutral-50">
+            <div>
+              <h4 className="font-bold text-black flex items-center gap-2">
+                Review Client Intake Dossiers &amp; Conflict Checks <span className="bg-black text-white text-[10px] px-2 py-0.5 uppercase tracking-widest">Intake Review</span>
+              </h4>
+              <p className="text-sm text-neutral-500 mt-1">Inspect client urgency tiers, location zip codes, budget expectations, opposing-party conflict checks, and case documents.</p>
+            </div>
+            <button
+              onClick={() => setActiveTab && setActiveTab("intakes")}
+              className="whitespace-nowrap border-2 border-black bg-black text-white px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors"
+            >
+              Review Intakes
+            </button>
+          </div>
+
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-neutral-200 gap-4">
             <div>
               <h4 className="font-bold text-black">Add Verified Case Results</h4>

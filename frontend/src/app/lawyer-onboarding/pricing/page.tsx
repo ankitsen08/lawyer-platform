@@ -6,6 +6,7 @@ import { Check, ArrowRight, ShieldCheck, Star, X, ArrowLeft, Camera, Upload, Lin
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
+import { getServerUrl } from "@/utils/apiUrl";
 
 export default function PricingOnboardingPage() {
   const [showModal, setShowModal] = useState(false);
@@ -77,7 +78,7 @@ export default function PricingOnboardingPage() {
 
     setIsSubmitting(true);
     try {
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const planName = selectedTier === 'Premium' ? 'Premium Tier' : 'Essential Tier';
 
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/lawyers/${lawyerId}/onboard`, {

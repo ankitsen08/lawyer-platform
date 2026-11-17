@@ -2,6 +2,7 @@ import Link from "next/link";
 import LawyerCard from "@/components/lawyer/LawyerCard";
 import { Lawyer } from "@/store/useCompareStore";
 import { ArrowLeft } from "lucide-react";
+import { getServerUrl } from "@/utils/apiUrl";
 
 export function generateStaticParams() {
   return [
@@ -26,7 +27,7 @@ export function generateStaticParams() {
 
 async function getCategoryLawyers(categoryName: string): Promise<Lawyer[]> {
   try {
-    const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+    const SERVER_URL = getServerUrl();
     const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/lawyers?category=${encodeURIComponent(categoryName)}`, {
       next: { revalidate: 60 }
     });

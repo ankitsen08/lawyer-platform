@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LayoutDashboard, UserCircle, CreditCard, BarChart3, Settings, ShieldCheck, Crown, ExternalLink, MessageSquare, FileQuestion } from "lucide-react";
+import { LayoutDashboard, UserCircle, CreditCard, BarChart3, Settings, ShieldCheck, Crown, ExternalLink, MessageSquare, FileQuestion, ClipboardCheck } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import LawyerMessagesTab from "@/components/chat/LawyerMessagesTab";
 import LawyerOverviewTab from "@/components/dashboard/LawyerOverviewTab";
@@ -10,6 +10,7 @@ import LawyerEditProfileTab from "@/components/dashboard/LawyerEditProfileTab";
 import LawyerBillingTab from "@/components/dashboard/LawyerBillingTab";
 import LawyerSettingsTab from "@/components/dashboard/LawyerSettingsTab";
 import LawyerQATab from "@/components/dashboard/LawyerQATab";
+import LawyerIntakeReviewTab from "@/components/dashboard/LawyerIntakeReviewTab";
 
 export default function AttorneyDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -39,6 +40,7 @@ export default function AttorneyDashboard() {
         <nav className="flex-1 p-4 space-y-2">
           {[
             { id: "overview", icon: LayoutDashboard, label: "Overview" },
+            { id: "intakes", icon: ClipboardCheck, label: "Client Intakes & Dossiers" },
             { id: "qa", icon: FileQuestion, label: "Q&A Manager" },
             { id: "messages", icon: MessageSquare, label: "Client Inbox" },
             { id: "profile", icon: UserCircle, label: "Edit Profile" },
@@ -73,6 +75,10 @@ export default function AttorneyDashboard() {
         
         {activeTab === "overview" && (
           <LawyerOverviewTab lawyerId={user?._id || user?.email || "lwy-001"} setActiveTab={setActiveTab} />
+        )}
+
+        {activeTab === "intakes" && (
+          <LawyerIntakeReviewTab lawyerId={user?._id || user?.email || "lwy-001"} setActiveTab={setActiveTab} />
         )}
 
         {activeTab === "qa" && (

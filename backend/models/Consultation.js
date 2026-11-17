@@ -15,6 +15,27 @@ const consultationSchema = new mongoose.Schema({
   clientPhone: {
     type: String
   },
+  clientCity: {
+    type: String,
+    trim: true
+  },
+  clientState: {
+    type: String,
+    trim: true
+  },
+  clientZipCode: {
+    type: String,
+    trim: true
+  },
+  preferredContactMethod: {
+    type: String,
+    enum: ['email', 'phone', 'sms', 'whatsapp'],
+    default: 'email'
+  },
+  smsConsent: {
+    type: Boolean,
+    default: false
+  },
   lawyerId: {
     type: String,
     required: true,
@@ -35,6 +56,39 @@ const consultationSchema = new mongoose.Schema({
   zoomLink: {
     type: String,
     default: "https://zoom.us/j/123456789"
+  },
+  format: {
+    type: String,
+    enum: ['zoom', 'phone', 'in_person'],
+    default: 'zoom'
+  },
+  legalCategory: {
+    type: String,
+    trim: true
+  },
+  legalSubCategory: {
+    type: String,
+    trim: true
+  },
+  urgency: {
+    type: String,
+    default: 'this_week'
+  },
+  incidentDate: {
+    type: String,
+    trim: true
+  },
+  budgetRange: {
+    type: String,
+    trim: true
+  },
+  caseSummary: {
+    type: String,
+    trim: true
+  },
+  opposingParty: {
+    type: String,
+    trim: true
   },
   status: {
     type: String,

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Lawyer } from './useCompareStore';
+import { getServerUrl } from '@/utils/apiUrl';
 
 // We can extend the Lawyer type for saved specific properties if needed, or just use Lawyer
 interface SavedLawyer extends Lawyer {
@@ -33,7 +34,7 @@ export const useSavedAttorneysStore = create<SavedAttorneysState>()(
         // Sync with backend if logged in
         if (clientId) {
           try {
-            const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+            const SERVER_URL = getServerUrl();
             await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/clients/${clientId}/saved-attorneys`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -50,7 +51,7 @@ export const useSavedAttorneysStore = create<SavedAttorneysState>()(
 
         if (clientId) {
           try {
-            const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+            const SERVER_URL = getServerUrl();
             await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/clients/${clientId}/saved-attorneys`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -62,7 +63,7 @@ export const useSavedAttorneysStore = create<SavedAttorneysState>()(
       },
       fetchSavedLawyers: async (clientId: string) => {
         try {
-          const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+          const SERVER_URL = getServerUrl();
           const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/clients/${clientId}/saved-attorneys`, {
             credentials: 'include'
           });

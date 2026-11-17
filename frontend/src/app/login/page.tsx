@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ShieldCheck, Briefcase } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
+import { getServerUrl } from "@/utils/apiUrl";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,18 +18,27 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || (!isLogin && !firmName)) {
+    if (!email || !password || (!isLogin && !firmName.trim())) {
       toast.error("Please fill in all required fields.");
       return;
     }
     
     try {
-      const SERVER_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
+      const SERVER_URL = getServerUrl();
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanFirm = firmName.trim();
+
       const res = await fetch(`${SERVER_URL.replace('ws://', 'http://').replace('wss://', 'https://')}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role: 'lawyer', firmName }),
+        body: JSON.stringify({ 
+          email: cleanEmail, 
+          password, 
+          role: 'lawyer', 
+          firmName: cleanFirm,
+          name: cleanFirm 
+        }),
         credentials: 'include' // Allow JWT cookie to be set
       });
 
@@ -39,7 +49,7 @@ export default function LoginPage() {
       }
 
       // Sync Zustand Store
-      loginLawyer(data.user);
+      loginLawyer(data.user, data.token);
       
       if (!data.user.onboarded) {
         toast.success("Account created!", { description: "Redirecting to profile setup..." });
@@ -134,13 +144,14 @@ export default function LoginPage() {
 
           <div className="mt-8 pt-6 border-t border-color-border-light text-center">
             <button 
+              type="button"
               onClick={() => setIsLogin(!isLogin)} 
-              className="text-sm text-color-text-muted hover:text-color-foreground"
+              className="text-sm text-color-text-muted hover:text-color-foreground cursor-pointer select-none inline-block mx-auto"
             >
               {isLogin ? (
-                <>Not listed yet? <span className="font-bold underline">Claim or create your profile</span></>
+                <>Not listed yet? <span className="font-bold underline cursor-pointer">Claim or create your profile</span></>
               ) : (
-                <>Already registered? <span className="font-bold underline">Sign in to your practice</span></>
+                <>Already registered? <span className="font-bold underline cursor-pointer">Sign in to your practice</span></>
               )}
             </button>
           </div>
