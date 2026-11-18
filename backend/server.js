@@ -138,6 +138,8 @@ function setAuthCookie(res, role, token) {
 
 // Helper: Sync onboarding case profile into an Inquiry dossier for attorney matching & review
 async function syncOnboardingInquiry({ userId, fullName, email, contact, caseProfile }) {
+  if (!caseProfile) return null;
+  contact = contact || {};
   const hasMeaningfulCaseInfo = Boolean(
     caseProfile.notes ||
     caseProfile.opposingParty ||
