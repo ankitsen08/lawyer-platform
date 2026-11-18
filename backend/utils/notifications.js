@@ -135,61 +135,114 @@ async function sendTransactionalEmail({ to, subject, html, icsContent, attachmen
 
 /**
  * Send Account Activation / Email Verification Link
+ * Built with RFC 2046 multipart/alternative (HTML + Plain-Text),
+ * anti-spam transactional headers, and CAN-SPAM compliance for high inbox placement.
  */
 async function sendVerificationEmail({ to, name, verificationUrl, token }) {
   const recipientName = name || 'Valued Client';
-  const subject = 'Activate Your LawyerComparison Account';
+  const subject = 'Verify your email address - LawyerComparison';
   
+  // RFC 2046 Plain-Text Alternative (Crucial for SpamAssassin & Google Mail Spam Filters)
+  const text = [
+    `Hello ${recipientName},`,
+    '',
+    'Thank you for registering with LawyerComparison.',
+    'Please verify your email address to activate your account by clicking the link below:',
+    '',
+    verificationUrl,
+    '',
+    'Security Information:',
+    '- This single-use activation link expires in 24 hours.',
+    '- If you did not create an account on LawyerComparison, no action is required and you can safely ignore this email.',
+    '',
+    'Need help? Contact our support team at support@lawyercomparison.us',
+    '',
+    '---',
+    'LawyerComparison Inc.',
+    '100 Pine Street, Suite 1250, San Francisco, CA 94111',
+    'Enterprise Legal Matchmaking & Verified Attorney Network',
+    'https://lawyercomparison.us'
+  ].join('\n');
+
   const html = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Activate Your Account</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Verify your email address</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f7f7f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0a0a0a;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f7f7f7; padding: 40px 10px;">
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #18181b; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f4f5; padding: 32px 12px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e5e5e5; border-top: 4px solid #000000; padding: 40px 32px;">
+        <table role="presentation" width="100%" style="max-width: 560px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e4e4e7; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
+          <!-- Header -->
           <tr>
-            <td align="left" style="padding-bottom: 24px; border-bottom: 1px solid #f0f0f0;">
-              <span style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #000000; text-transform: uppercase;">Lawyer<span style="color: #737373;">Comparison</span></span>
+            <td style="padding: 28px 32px 20px 32px; border-bottom: 1px solid #f4f4f5; background-color: #09090b;">
+              <span style="font-size: 18px; font-weight: 800; letter-spacing: -0.3px; color: #ffffff; text-transform: uppercase;">
+                LAWYER<span style="color: #a1a1aa;">COMPARISON</span>
+              </span>
             </td>
           </tr>
+
+          <!-- Main Content -->
           <tr>
-            <td style="padding: 28px 0 16px 0;">
-              <h1 style="font-size: 22px; font-weight: 700; margin: 0 0 12px 0; color: #0a0a0a;">Activate Your Account</h1>
-              <p style="font-size: 15px; line-height: 24px; color: #404040; margin: 0 0 16px 0;">
+            <td style="padding: 32px 32px 24px 32px;">
+              <h1 style="font-size: 20px; font-weight: 700; margin: 0 0 16px 0; color: #09090b; letter-spacing: -0.3px;">
+                Verify your email address
+              </h1>
+              
+              <p style="font-size: 15px; line-height: 24px; color: #3f3f46; margin: 0 0 16px 0;">
                 Hello <strong>${recipientName}</strong>,
               </p>
-              <p style="font-size: 15px; line-height: 24px; color: #404040; margin: 0 0 24px 0;">
-                Thank you for completing your client onboarding with LawyerComparison. To activate your account, ensure conflict check confidentiality, and enable direct consultations with verified attorneys, please verify your email address:
+              
+              <p style="font-size: 15px; line-height: 24px; color: #3f3f46; margin: 0 0 24px 0;">
+                Thank you for completing your client onboarding with LawyerComparison. To activate your account, ensure attorney confidentiality, and enable direct consultations with verified lawyers, please verify your email address:
               </p>
-              <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
+
+              <!-- Action Button -->
+              <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 28px 0;">
                 <tr>
-                  <td align="center" style="background-color: #000000; border-radius: 2px;">
-                    <a href="${verificationUrl}" target="_blank" style="display: inline-block; padding: 14px 32px; font-size: 13px; font-weight: 700; color: #ffffff; text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">
-                      Activate Account
+                  <td align="center" style="background-color: #09090b; border-radius: 6px;">
+                    <a href="${verificationUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; color: #ffffff; text-decoration: none; letter-spacing: 0.2px;">
+                      Verify & Activate Account &rarr;
                     </a>
                   </td>
                 </tr>
               </table>
-              <p style="font-size: 13px; line-height: 20px; color: #737373; margin: 24px 0 8px 0;">
-                Button not working? Copy and paste this secure link into your browser:
+
+              <!-- Fallback Link -->
+              <p style="font-size: 13px; line-height: 20px; color: #71717a; margin: 24px 0 8px 0;">
+                Button not working? Copy and paste this link into your browser:
               </p>
-              <p style="font-size: 12px; line-height: 18px; color: #000000; word-break: break-all; margin: 0 0 24px 0; background: #fafafa; padding: 12px; border: 1px solid #eee;">
-                <a href="${verificationUrl}" style="color: #000000; text-decoration: underline;">${verificationUrl}</a>
+              <p style="font-size: 12px; line-height: 18px; color: #09090b; word-break: break-all; margin: 0 0 24px 0; background-color: #f4f4f5; padding: 12px 14px; border-radius: 6px; border: 1px solid #e4e4e7;">
+                <a href="${verificationUrl}" style="color: #09090b; text-decoration: underline;">${verificationUrl}</a>
               </p>
-              <p style="font-size: 12px; line-height: 18px; color: #a3a3a3; margin: 0; border-top: 1px solid #f0f0f0; padding-top: 16px;">
-                Note: This activation link expires in 24 hours. If you did not create an account on LawyerComparison, no further action is required and you can safely disregard this message.
-              </p>
+
+              <!-- Security Notice -->
+              <div style="background-color: #fafafa; border-radius: 6px; padding: 12px 14px; border-left: 3px solid #71717a; margin-bottom: 24px;">
+                <p style="font-size: 12px; line-height: 18px; color: #52525b; margin: 0;">
+                  <strong>Security Note:</strong> This activation link is unique to your account and expires in 24 hours. If you did not create an account on LawyerComparison, no action is needed and you can safely disregard this message.
+                </p>
+              </div>
             </td>
           </tr>
+
+          <!-- Footer (CAN-SPAM Compliant) -->
           <tr>
-            <td align="center" style="padding-top: 24px; font-size: 11px; color: #a3a3a3;">
-              &copy; ${new Date().getFullYear()} LawyerComparison Inc. All rights reserved. &bull; Enterprise Legal Matchmaking
+            <td style="padding: 20px 32px 28px 32px; background-color: #fafafa; border-top: 1px solid #e4e4e7; font-size: 11px; line-height: 18px; color: #71717a;">
+              <p style="margin: 0 0 8px 0;">
+                You received this transactional email because an account was registered with your email address on <a href="https://lawyercomparison.us" style="color: #09090b; text-decoration: underline;">LawyerComparison.us</a>.
+              </p>
+              <p style="margin: 0 0 8px 0;">
+                LawyerComparison Inc. &bull; 100 Pine Street, Suite 1250, San Francisco, CA 94111 &bull; 
+                <a href="mailto:support@lawyercomparison.us" style="color: #71717a; text-decoration: underline;">support@lawyercomparison.us</a>
+              </p>
+              <p style="margin: 0; color: #a1a1aa;">
+                &copy; ${new Date().getFullYear()} LawyerComparison Inc. All rights reserved. Enterprise Legal Matchmaking.
+              </p>
             </td>
           </tr>
         </table>
@@ -229,13 +282,29 @@ async function sendVerificationEmail({ to, name, verificationUrl, token }) {
 
       const transporter = nodemailer.createTransport(transportConfig);
 
+      // Unique RFC 5322 Message-ID to prevent duplicate spam suppression
+      const cleanTokenSlug = token ? token.substring(0, 16) : Math.random().toString(36).substring(2, 10);
+      const messageId = `<verify-${cleanTokenSlug}-${Date.now()}@lawyercomparison.us>`;
+
       await transporter.sendMail({
-        from: process.env.EMAIL_FROM || (smtpUser ? `"LawyerComparison" <${smtpUser}>` : '"LawyerComparison" <notifications@lawyercomparison.com>'),
+        from: process.env.EMAIL_FROM || (smtpUser ? `"LawyerComparison" <${smtpUser}>` : '"LawyerComparison" <support@lawyercomparison.us>'),
+        replyTo: process.env.EMAIL_REPLY_TO || 'support@lawyercomparison.us',
         to,
         subject,
-        html
+        text, // RFC 2046 multipart/alternative plain text
+        html,
+        messageId,
+        headers: {
+          'X-Entity-Ref-ID': `lc-verify-${cleanTokenSlug}`,
+          'X-Auto-Response-Suppress': 'All, OOF, AutoReply',
+          'Auto-Submitted': 'auto-generated',
+          'Precedence': 'bulk',
+          'Feedback-ID': 'verification:client:lawyercomparison',
+          'List-Unsubscribe': '<mailto:support@lawyercomparison.us?subject=unsubscribe>',
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+        }
       });
-      console.log(`[Email] Activation email successfully sent via SMTP to ${to}`);
+      console.log(`[Email] Activation email successfully sent via SMTP to ${to} (Message-ID: ${messageId})`);
       return { success: true, provider: 'smtp', verificationUrl };
     } catch (smtpErr) {
       console.warn(`[Email] Nodemailer/SMTP failed (${smtpErr.message}), falling back to Resend / simulation.`);

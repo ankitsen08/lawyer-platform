@@ -259,11 +259,22 @@ async function syncOnboardingInquiry({ userId, fullName, email, contact, casePro
 function getClientOrigin(req) {
   if (req) {
     const raw = req.headers?.origin || (req.headers?.referer ? (() => { try { return new URL(req.headers.referer).origin; } catch(_) { return null; } })() : null);
-    if (raw && (raw.includes('localhost') || raw.includes('127.0.0.1') || raw.includes('lawyercomparison'))) {
+    if (raw && (raw.includes('localhost') || raw.includes('127.0.0.1') || raw.includes('lawyercomparison') || raw.includes('vercel.app'))) {
       return raw;
     }
   }
   return process.env.CLIENT_ORIGIN || 'http://localhost:3000';
+}
+
+// Public HTTPS application URL for outgoing emails delivered across the internet
+function getPublicAppUrl(req) {
+  if (req) {
+    const raw = req.headers?.origin || (req.headers?.referer ? (() => { try { return new URL(req.headers.referer).origin; } catch(_) { return null; } })() : null);
+    if (raw && raw.startsWith('https://') && !raw.includes('localhost') && !raw.includes('127.0.0.1')) {
+      return raw;
+    }
+  }
+  return process.env.PUBLIC_APP_URL || 'https://lawyercomparison.us';
 }
 
 // Register Endpoint
@@ -295,7 +306,9 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24-hour expiration window
     const clientOrigin = getClientOrigin(req);
-    const verificationUrl = `${clientOrigin}/verify-email?token=${verificationToken}`;
+    const publicAppUrl = getPublicAppUrl(req);
+    const verificationUrl = `${publicAppUrl}/verify-email?token=${verificationToken}`;
+    const localVerificationUrl = `${clientOrigin}/verify-email?token=${verificationToken}`;
 
     if (isMongoConnected) {
       const existingUser = await User.findOne({ email: cleanEmail });
@@ -677,7 +690,9 @@ app.post('/api/auth/resend-verification', authLimiter, optionalAuth, async (req,
     }
 
     const clientOrigin = getClientOrigin(req);
-    const verificationUrl = `${clientOrigin}/verify-email?token=${verificationToken}`;
+    const publicAppUrl = getPublicAppUrl(req);
+    const verificationUrl = `${publicAppUrl}/verify-email?token=${verificationToken}`;
+    const localVerificationUrl = `${clientOrigin}/verify-email?token=${verificationToken}`;
 
     await sendVerificationEmail({
       to: cleanEmail,
@@ -689,7 +704,7 @@ app.post('/api/auth/resend-verification', authLimiter, optionalAuth, async (req,
     return res.json({ 
       success: true, 
       message: 'A fresh activation link has been sent to your email address.',
-      verificationUrl: process.env.NODE_ENV !== 'production' ? verificationUrl : undefined 
+      verificationUrl: process.env.NODE_ENV !== 'production' ? localVerificationUrl : undefined 
     });
   } catch (error) {
     console.error('[-] Resend Verification Error:', error);
@@ -763,7 +778,9 @@ app.post('/api/auth/update-email', authLimiter, optionalAuth, async (req, res) =
     }
 
     const clientOrigin = getClientOrigin(req);
-    const verificationUrl = `${clientOrigin}/verify-email?token=${verificationToken}`;
+    const publicAppUrl = getPublicAppUrl(req);
+    const verificationUrl = `${publicAppUrl}/verify-email?token=${verificationToken}`;
+    const localVerificationUrl = `${clientOrigin}/verify-email?token=${verificationToken}`;
 
     await sendVerificationEmail({
       to: newEmail,
@@ -779,7 +796,7 @@ app.post('/api/auth/update-email', authLimiter, optionalAuth, async (req, res) =
       message: `Email updated to ${newEmail}. Verification link has been sent!`,
       email: newEmail,
       token: verificationToken,
-      verificationUrl: process.env.NODE_ENV !== 'production' ? verificationUrl : undefined
+      verificationUrl: process.env.NODE_ENV !== 'production' ? localVerificationUrl : undefined
     });
   } catch (error) {
     console.error('[-] Update Email Error:', error);
